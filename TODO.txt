@@ -3,3 +3,4 @@
 
 - No longer use glWidget for camera stream. Use stuff directly in another class. User glWidget for the two running videos.
 - Make processThread calculate both moments at the same time to increase efficency.
+Test Edit
