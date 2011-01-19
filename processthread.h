@@ -23,12 +23,14 @@ private:
     QColor bleh;
     int pointer1;
     int pointer2;
-    int oldX, oldY;
+    int oldbX, oldbY;
+    int oldyX, oldyY;
     int counter;
+    bool stopRequested;
 protected:
     void run();
 signals:
-    void processFinished(int,int);
+    void processFinished(int, int, int, int);
 public slots:
     //void picReceived(QImage);
     void processStuff(QImage);

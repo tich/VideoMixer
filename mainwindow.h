@@ -35,6 +35,7 @@ private:
     QPixmap image[10];
     QImage myImage;
     CaptureThread *bla;
+    CameraThread *bleh;
     ProcessThread *proc;
     GLWidget * glwidget;
     int count;
@@ -44,7 +45,7 @@ private slots:
     void on_verticalSlider_valueChanged(int value);
     void update();
     void setPicture(QImage);
-    void getCoord(int,int);
+    void getCoord(int,int,int,int);
 signals:
     void process(QImage);
 };

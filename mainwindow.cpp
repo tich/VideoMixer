@@ -40,11 +40,11 @@ MainWindow::MainWindow(QWidget *parent) :
     setAttribute(Qt::WA_PaintOnScreen,true);
     */
 
-    CameraThread *bleh = new CameraThread(NULL);
+    bleh = new CameraThread(NULL);
     bleh->startThread(ui->widget_2);
     glwidget = new GLWidget(ui->widget_2);
     proc = new ProcessThread(this);
-    connect(proc, SIGNAL(processFinished(int,int)), SLOT(getCoord(int,int)));
+    connect(proc, SIGNAL(processFinished(int,int,int,int)), SLOT(getCoord(int,int,int,int)));
     connect(glwidget, SIGNAL(processMe(QImage)), proc, SLOT(processStuff(QImage)));
     timer2 = new QTimer(this);
     timer2->setInterval(20);//40=25Hz
@@ -88,11 +88,11 @@ void MainWindow::update()
         ui->label_2->setPixmap(troll);
     }*/
 }
-void MainWindow::getCoord(int posX, int posY)
+void MainWindow::getCoord(int posbX, int posbY, int posyX, int posyY)
 {
     //ui->label_3->setText(QString::number(posY));
-    ui->label->setGeometry(110+posX, 10+posY, ui->label->geometry().width(), ui->label->geometry().height());
-    ui->widget->setGeometry(370+posX, 10+posY, ui->widget->geometry().width(), ui->widget->geometry().height());
+    ui->label->setGeometry(110+posyX, 10+posyY, ui->label->geometry().width(), ui->label->geometry().height());
+    ui->widget->setGeometry(370+posbX, 10+posbY, ui->widget->geometry().width(), ui->widget->geometry().height());
 }
 
 void MainWindow::setPicture(QImage Image)
@@ -107,6 +107,24 @@ void MainWindow::setPicture(QImage Image)
 MainWindow::~MainWindow()
 {
     //bla->stopUlan();
+    printf("Terminating...\n");
+    if(bleh)
+    {
+        bleh->stopThread();
+        delete bleh;
+    }
+    if(proc)
+    {
+        proc->stopThread();
+        delete proc;
+    }
+    if(timer2)
+    {
+        timer2->stop();
+        delete timer2;
+    }
+    if(glwidget)
+        delete glwidget;
     delete ui;
 }
 

@@ -99,7 +99,7 @@ gboolean CameraCapture::initialize_pipeline(int *argc, char ***argv) {
 	//caps = gst_caps_from_string("video/x-raw-rgb,width=592,height=400");//framerate=[1/30,30/1]
 
 	/* Link the image-branch of the pipeline.*/
-        if(!gst_element_link_filtered(csp_filter,image_sink, NULL)) return FALSE;
+        if(!gst_element_link_many(csp_filter,image_sink, NULL)) return FALSE;
         //if(!gst_element_link_many(csp_filter,image_sink, NULL)) return FALSE;
         //if(!gst_element_link_filtered(image_filter, image_sink,caps)) return FALSE;
 

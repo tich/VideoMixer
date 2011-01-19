@@ -68,8 +68,8 @@ void GLWidget::refresh_texture()
                         QImage image = QImage(data, iwidth, iheight, QImage::Format_RGB888).mirrored(true, false);
                         //glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, iwidth,iheight, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
                         emit processMe(image);
+                        gst_buffer_unref(CameraCapture::buffer);
 		}
-                gst_buffer_unref(CameraCapture::buffer);
 	}
 }
 
