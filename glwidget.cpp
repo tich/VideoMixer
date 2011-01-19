@@ -30,6 +30,7 @@ GLWidget::GLWidget(QWidget *parent)
     createdNormals = 0;
     m_vertexNumber = 0;
     frames = 0;
+    first=true;
     setAttribute(Qt::WA_PaintOnScreen,true);
 //    setAttribute(Qt::WA_NoSystemBackground,true);
 
@@ -50,27 +51,29 @@ GLWidget::~GLWidget()
 
 void GLWidget::refresh_texture()
 {
-        if(CameraCapture::scanning)
-	{
-                CameraCapture::refresh_buffer(); //manually call appsink, not through the callback function
+    if(CameraCapture::scanning)
+    {
+        CameraCapture::refresh_buffer(); //manually call appsink, not through the callback function
 
-                if(CameraCapture::buffer!=NULL)
-		{
-			glBindTexture( GL_TEXTURE_2D, m_uiTexture );
-                        unsigned char* data=(unsigned char *) GST_BUFFER_DATA (CameraCapture::buffer);
-                        QString bla(gst_caps_to_string(CameraCapture::buffer->caps));
-                        QString b = bla.remove(0, bla.indexOf("width=(int)")+11);
-                        QString width = b.left(b.indexOf(", height"));
-                        int iwidth = width.toInt();
-                        b = bla.remove(0, bla.indexOf("height=(int)")+12);
-                        QString height = b.left(b.indexOf(", framerate"));
-                        int iheight = height.toInt();
-                        QImage image = QImage(data, iwidth, iheight, QImage::Format_RGB888).mirrored(true, false);
-                        //glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, iwidth,iheight, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
-                        emit processMe(image);
-                        gst_buffer_unref(CameraCapture::buffer);
-		}
-	}
+        if(CameraCapture::buffer!=NULL)
+        {
+            glBindTexture( GL_TEXTURE_2D, m_uiTexture );
+            unsigned char* data=(unsigned char *) GST_BUFFER_DATA (CameraCapture::buffer);
+            if(first)
+            {
+                QString bla(gst_caps_to_string(CameraCapture::buffer->caps));
+                QString b = bla.remove(0, bla.indexOf("width=(int)")+11);
+                QString width = b.left(b.indexOf(", height"));
+                iwidth = width.toInt();
+                b = bla.remove(0, bla.indexOf("height=(int)")+12);
+                QString height = b.left(b.indexOf(", framerate"));
+                iheight = height.toInt();
+                first = false;
+            }
+            glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, iwidth,iheight, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
+            gst_buffer_unref(CameraCapture::buffer);
+        }
+    }
 }
 
 

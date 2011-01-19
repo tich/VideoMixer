@@ -27,6 +27,8 @@ private:
     GLfloat *createdNormals;
     int m_vertexNumber;
     int frames;
+    int iwidth, iheight;
+    bool first;
     QTime time;
     GLuint program1;
     GLuint program2;

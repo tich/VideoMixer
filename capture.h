@@ -18,10 +18,19 @@ public:
     void stopThread();
     QMutex mutex;
 private:
+    CameraCapture *camera;
     bool isRunning;
+    bool first;
+    int iwidth, iheight;
+    QTimer *timer;
     QWidget *m_parent;
+
 protected:
     void run();
+private slots:
+    void updateImage();
+signals:
+    void processMe(QImage);
 };
 
 #endif // CAMERATHREAD_H

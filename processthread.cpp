@@ -36,7 +36,7 @@ void ProcessThread::stopThread()
 {
     stopRequested = true;
     isRunning = false;
-    //this->terminate();
+    this->terminate();
 }
 
 void ProcessThread::run()
@@ -46,6 +46,8 @@ void ProcessThread::run()
         mutex.lock();
         image = images[pointer2 % 30].copy();
         mutex.unlock();
+        if(image.isNull())
+            continue;
         pointer2++;
         if(pointer2 == 30000)
             pointer2 = 0;
@@ -92,6 +94,6 @@ void ProcessThread::run()
         emit processFinished(oldbX, oldbY, oldyX, oldyY);
     }
     isRunning = false;
-    if(stopRequested)
-        this->terminate();
+//    if(stopRequested)
+//        return;
 }

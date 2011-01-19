@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    //setAttribute(Qt::WA_DeleteOnClose);
     ui->setupUi(this);
     // this code is inside a class that inherits a QWidget
   /*
@@ -40,17 +41,17 @@ MainWindow::MainWindow(QWidget *parent) :
     setAttribute(Qt::WA_PaintOnScreen,true);
     */
 
-    bleh = new CameraThread(NULL);
-    bleh->startThread(ui->widget_2);
+    bleh = new CameraThread(this);
+    bleh->startThread(NULL);
     glwidget = new GLWidget(ui->widget_2);
     proc = new ProcessThread(this);
     connect(proc, SIGNAL(processFinished(int,int,int,int)), SLOT(getCoord(int,int,int,int)));
-    connect(glwidget, SIGNAL(processMe(QImage)), proc, SLOT(processStuff(QImage)));
+    connect(bleh, SIGNAL(processMe(QImage)), proc, SLOT(processStuff(QImage)));
     timer2 = new QTimer(this);
     timer2->setInterval(20);//40=25Hz
     connect(timer2, SIGNAL(timeout()), this, SLOT(update()));
     glwidget->setGeometry(0,0,ui->widget_2->width(),ui->widget_2->height());
-    timer2->start();
+    //timer2->start();
 
     /*
     connect(bla, SIGNAL(renderedImage(QImage)),SLOT(setPicture(QImage)));
