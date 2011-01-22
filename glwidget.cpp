@@ -1,7 +1,7 @@
 #include "glwidget.h"
 #include <QPainter>
 #include <math.h>
-#include "cameracapture.h"
+#include "gstvideoplayer.h"
 
 inline void IdentityMatrix(GLfloat *m)
 {
@@ -23,7 +23,7 @@ inline void IdentityMatrix(GLfloat *m)
     m[3 * 4 + 3] = 1.0f;
 }
 
-GLWidget::GLWidget(QWidget *parent)
+GLWidget::GLWidget(QWidget *parent, int video_index)
     : QGLWidget(parent)
 {
     createdVertices = 0;
@@ -31,6 +31,7 @@ GLWidget::GLWidget(QWidget *parent)
     m_vertexNumber = 0;
     frames = 0;
     first=true;
+    video_stream = video_index;
     setAttribute(Qt::WA_PaintOnScreen,true);
 //    setAttribute(Qt::WA_NoSystemBackground,true);
 
@@ -51,17 +52,18 @@ GLWidget::~GLWidget()
 
 void GLWidget::refresh_texture()
 {
-    if(CameraCapture::scanning)
+    if(gstVideoPlayer::scanning)
     {
-        CameraCapture::refresh_buffer(); //manually call appsink, not through the callback function
+        gstVideoPlayer::refresh_buffer(video_stream); //manually call appsink, not through the callback function
 
-        if(CameraCapture::buffer!=NULL)
+        if(gstVideoPlayer::buffer!=NULL && gstVideoPlayer::buffer[video_stream]!=NULL)
         {
             glBindTexture( GL_TEXTURE_2D, m_uiTexture );
-            unsigned char* data=(unsigned char *) GST_BUFFER_DATA (CameraCapture::buffer);
+            unsigned char* data=(unsigned char *) GST_BUFFER_DATA (gstVideoPlayer::buffer[video_stream]);
             if(first)
             {
-                QString bla(gst_caps_to_string(CameraCapture::buffer->caps));
+                QString bla(gst_caps_to_string(gstVideoPlayer::buffer[video_stream]->caps));
+                printf("%s",bla.toStdString().c_str());
                 QString b = bla.remove(0, bla.indexOf("width=(int)")+11);
                 QString width = b.left(b.indexOf(", height"));
                 iwidth = width.toInt();
@@ -69,10 +71,13 @@ void GLWidget::refresh_texture()
                 QString height = b.left(b.indexOf(", framerate"));
                 iheight = height.toInt();
                 first = false;
+                printf("\nwidth = %d, height = %d\n", iwidth, iheight);
             }
             glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, iwidth,iheight, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
-            gst_buffer_unref(CameraCapture::buffer);
+            gst_buffer_unref(gstVideoPlayer::buffer[video_stream]);
         }
+        else
+            printf("Buffer null\n");
     }
 }
 

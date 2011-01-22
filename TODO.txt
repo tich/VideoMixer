@@ -1,5 +1,5 @@
 - Basically you have two choices - either using or not using OpenGL. The first approach requires you to use QGLWidget and to display images by binding them as textures (using bindTexture()) and using those textures on a rectangle (preferably square one) which you display in the GL widget. With the other approach you will be displaying images on a QLabel object using QLabel::setPixmap(). The GL approach will be much faster but requires more coding.
 
+- See why the sudden drop in FPS once the camera stream kicks in, regardless of whether we're processing images or not.
 
-- No longer use glWidget for camera stream. Use stuff directly in another class. User glWidget for the two running videos.
-- Make processThread calculate both moments at the same time to increase efficency.
+- Optimize image processing.

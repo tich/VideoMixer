@@ -11,7 +11,7 @@ class GLWidget : public QGLWidget {
 
     Q_OBJECT
 public:
-    GLWidget(QWidget *parent = 0);
+    GLWidget(QWidget *parent = 0, int video_index=0);
     ~GLWidget();
     void refresh_texture();
     void paintTexturedCube();
@@ -20,6 +20,7 @@ protected:
     void initializeGL ();
     void paintEvent (QPaintEvent *);
 private:
+    int video_stream;
     GLuint  m_uiTexture;
     qreal   m_fAngle;
     qreal   m_fScale;

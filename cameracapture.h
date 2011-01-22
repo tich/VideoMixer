@@ -2,8 +2,8 @@
  * THE GSTREAMER PIPELINE CODE TAKEN FROM THE MAEMO 5 CAMERA EXAMPLE
  * http://wiki.maemo.org/Documentation/Maemo_5_Developer_Guide/Using_Multimedia_Components/Camera_API_Usage
  * ************************************************************************************************************/
-#ifndef CAMERAN900_H
-#define CAMERAN900_H
+#ifndef CAMERA_H
+#define CAMERA_H
 
 #include <gst/app/gstappsink.h>
 #include <QObject>

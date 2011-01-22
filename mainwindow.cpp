@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "capturethread.h"
 #include "cameracapture.h"
+#include "gstvideoplayer.h"
 #include "glwidget.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -43,15 +44,26 @@ MainWindow::MainWindow(QWidget *parent) :
 
     bleh = new CameraThread(this);
     bleh->startThread(NULL);
-    glwidget = new GLWidget(ui->widget_2);
     proc = new ProcessThread(this);
     connect(proc, SIGNAL(processFinished(int,int,int,int)), SLOT(getCoord(int,int,int,int)));
     connect(bleh, SIGNAL(processMe(QImage)), proc, SLOT(processStuff(QImage)));
+
+    glwidget = new GLWidget(ui->widget_2, 0);
+    gstVideoPlayer *vid =new gstVideoPlayer();
+    QStringList Files;
+    Files.append("/home/tich/Desktop/vid.flv");
+    if (!vid->initialize_pipeline (Files))
+    {
+        printf("Failed to initialize video pipeline!\n");
+        return;
+    }
+    else
+        vid->toggle_play_state(0);
     timer2 = new QTimer(this);
     timer2->setInterval(20);//40=25Hz
     connect(timer2, SIGNAL(timeout()), this, SLOT(update()));
     glwidget->setGeometry(0,0,ui->widget_2->width(),ui->widget_2->height());
-    //timer2->start();
+    timer2->start();
 
     /*
     connect(bla, SIGNAL(renderedImage(QImage)),SLOT(setPicture(QImage)));
@@ -64,7 +76,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::update()
 {
-
     glwidget->repaint();
     glwidget->updateGL();
     glwidget->paintEngine();
@@ -93,7 +104,7 @@ void MainWindow::getCoord(int posbX, int posbY, int posyX, int posyY)
 {
     //ui->label_3->setText(QString::number(posY));
     ui->label->setGeometry(110+posyX, 10+posyY, ui->label->geometry().width(), ui->label->geometry().height());
-    ui->widget->setGeometry(370+posbX, 10+posbY, ui->widget->geometry().width(), ui->widget->geometry().height());
+    ui->widget_2->setGeometry(370+posbX, 10+posbY, ui->widget_2->geometry().width(), ui->widget_2->geometry().height());
 }
 
 void MainWindow::setPicture(QImage Image)

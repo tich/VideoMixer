@@ -13,13 +13,15 @@ SOURCES += main.cpp \
     capturethread.cpp \
     processthread.cpp \
     cameracapture.cpp \
-    glwidget.cpp
+    glwidget.cpp \
+    gstvideoplayer.cpp
 HEADERS += mainwindow.h \
     capture.h \
     capturethread.h \
     processthread.h \
     glwidget.h \
-    cameracapture.h
+    cameracapture.h \
+    gstvideoplayer.h
 FORMS += mainwindow.ui
 OTHER_FILES += TODO.txt
 LIBS += -L/usr/lib/ \
