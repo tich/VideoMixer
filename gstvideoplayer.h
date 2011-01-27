@@ -12,6 +12,7 @@ class gstVideoPlayer : public QObject
 
 public:
     gstVideoPlayer();
+    ~gstVideoPlayer();
     void toggle_play_state(int video_stream, int play);
     static gboolean bus_callback (GstBus * bus, GstMessage * message);
     gboolean initialize_pipeline (QStringList Files);

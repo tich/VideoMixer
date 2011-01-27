@@ -14,6 +14,7 @@ class CameraThread : public QThread
 Q_OBJECT
 public:
     explicit CameraThread(QObject *parent = 0);
+    ~CameraThread();
     void startThread(QWidget *parent);
     void stopThread();
     QMutex mutex;

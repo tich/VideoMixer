@@ -13,6 +13,7 @@ class CameraCapture : public QObject
 {
     public:
         CameraCapture();
+        ~CameraCapture();
     	void toggle_camera_stream();
     	static gboolean bus_callback (GstBus * bus, GstMessage * message);
     	gboolean initialize_pipeline (int *argc, char ***argv);

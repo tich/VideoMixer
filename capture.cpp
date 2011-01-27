@@ -1,5 +1,11 @@
 #include "capture.h"
 
+CameraThread::~CameraThread()
+{
+    if(camera)
+        delete camera;
+}
+
 CameraThread::CameraThread(QObject *parent) :
     QThread(parent)
 {
@@ -15,6 +21,7 @@ void CameraThread::startThread(QWidget *parent)
 }
 void CameraThread::stopThread()
 {
+    printf("Stopping camera thread.\n");
     isRunning = false;
     this->terminate();
 }

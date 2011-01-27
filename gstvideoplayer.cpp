@@ -24,7 +24,18 @@ gstVideoPlayer::gstVideoPlayer()
 {
         scanning_status = 0;
 }
-
+gstVideoPlayer::~gstVideoPlayer()
+{
+    printf("Destroying video pipelines.\n");
+    for(int i=0; i<gstVideoPlayer::length; i++)
+    {
+        if(pipelines[i])
+        {
+            gst_element_set_state (pipelines[i], GST_STATE_NULL);
+            gst_object_unref (pipelines[i]);
+        }
+    }
+}
 
 gboolean gstVideoPlayer::initialize_pipeline(QStringList Files)
 {
@@ -70,16 +81,16 @@ gboolean gstVideoPlayer::initialize_pipeline(QStringList Files)
         /* Create elements */
 
         /* Camera video stream comes from a Video4Linux driver */
-        video_src = gst_element_factory_make("filesrc", "file_src");
+        video_src = gst_element_factory_make("filesrc", NULL);//"file_src");
         g_object_set(G_OBJECT(video_src), "location", temp.toStdString().c_str(), NULL);
 
-        decode_bin = gst_element_factory_make("decodebin2", "decode_bin");
-        queue = gst_element_factory_make("queue", "queue_stuff");
+        decode_bin = gst_element_factory_make("decodebin2", NULL);//"decode_bin");
+        queue = gst_element_factory_make("queue", NULL);//"queue_stuff");
         /* Colorspace filter is needed to make sure that sinks understands the stream coming from the camera */
-        csp_filter = gst_element_factory_make("ffmpegcolorspace", "csp_filter");
+        csp_filter = gst_element_factory_make("ffmpegcolorspace", NULL);//"csp_filter");
 
         /* A dummy sink for the image stream. Goes to bitheaven AppSink*/
-        image_sink = gst_element_factory_make("appsink", "image_sink");
+        image_sink = gst_element_factory_make("appsink", NULL);//"image_sink");
 
         /* Check that elements are correctly initialized */
         if(!(pipeline && video_src && csp_filter && decode_bin && image_sink && queue))
@@ -92,18 +103,13 @@ gboolean gstVideoPlayer::initialize_pipeline(QStringList Files)
         gst_bin_add_many(GST_BIN(pipeline), video_src, decode_bin, queue, csp_filter,image_sink,NULL);
 
         /* Link the camera source and colorspace filter using capabilitie specified */
-        if(!gst_element_link_filtered(video_src, decode_bin,NULL))
+        if(!gst_element_link(video_src, decode_bin))
         {
             printf("Couldn't link video_src\n");
             return FALSE;
         }
         g_signal_connect(decode_bin, "new-decoded-pad", G_CALLBACK (decodebin_new_decoded_pad_cb), queue);
-        //gst_caps_unref(caps);
-        /*if(!gst_element_link_filtered(decode_bin, queue, NULL))
-        {
-            printf("Couldn't link decode_bin\n");
-            return FALSE;
-        }*/
+
         if(!gst_element_link(queue, csp_filter))
         {
             printf("Couldn't link queue\n");

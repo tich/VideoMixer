@@ -133,7 +133,6 @@ void MainWindow::setPicture(QImage Image)
 
 MainWindow::~MainWindow()
 {
-    //bla->stopUlan();
     printf("Terminating...\n");
     if(bleh)
     {
@@ -152,6 +151,10 @@ MainWindow::~MainWindow()
     }
     if(glwidget)
         delete glwidget;
+    if(glwidget2)
+        delete glwidget2;
+    if(vid)
+        delete vid;
     delete ui;
 }
 

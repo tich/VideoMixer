@@ -25,6 +25,15 @@ CameraCapture::CameraCapture()
         scanning_status = 0;
 	count=0;
 }
+CameraCapture::~CameraCapture()
+{
+    printf("Stopping camera pipeline.\n");
+    if(pipeline)
+    {
+       gst_element_set_state (pipeline, GST_STATE_NULL);
+       gst_object_unref (pipeline);
+    }
+}
 
 /* ***********************************************************************************************************
  * We are creating a pipeline like:  |v4l2camsrc (omap3cam)| |ffmpegcolorspace| |appsink|
@@ -72,7 +81,7 @@ gboolean CameraCapture::initialize_pipeline(int *argc, char ***argv) {
 	}
 
 	/* Add elements to the pipeline. This has to be done prior to linking them */
-	gst_bin_add_many(GST_BIN(pipeline), camera_src, csp_filter,image_filter,image_sink,NULL);
+        gst_bin_add_many(GST_BIN(pipeline), camera_src, csp_filter,image_filter,image_sink,NULL);
 
 	/* Specify what kind of video is wanted from the camera */
 	//caps = gst_caps_from_string("video/x-raw-yuv,format=(fourcc)UYVY,width=800,height=480"); //framerate=[1/30,30/1]
@@ -99,7 +108,7 @@ gboolean CameraCapture::initialize_pipeline(int *argc, char ***argv) {
 	//caps = gst_caps_from_string("video/x-raw-rgb,width=592,height=400");//framerate=[1/30,30/1]
 
 	/* Link the image-branch of the pipeline.*/
-        if(!gst_element_link_many(csp_filter,image_sink, NULL)) return FALSE;
+        if(!gst_element_link(csp_filter,image_sink)) return FALSE;
         //if(!gst_element_link_many(csp_filter,image_sink, NULL)) return FALSE;
         //if(!gst_element_link_filtered(image_filter, image_sink,caps)) return FALSE;
 
