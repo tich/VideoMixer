@@ -31,7 +31,7 @@ private:
     QGraphicsScene *scene;
     QTimer *timer;
     QTimer *timer2;
-    Phonon::MediaObject *m_MediaObject;
+    //Phonon::MediaObject *m_MediaObject;
     Phonon::VideoWidget *m_videoWidget;
     QPixmap image[10];
     QImage myImage;

@@ -48,6 +48,7 @@ gboolean gstVideoPlayer::initialize_pipeline(QStringList Files)
         appsink[i] = NULL;
     buffer = new GstBuffer*[Files.length()];
     printf("length: %d\n", Files.length());
+
     for(int i=0; i<length;i++)
     {
         QString temp = Files.takeAt(0);
@@ -55,6 +56,13 @@ gboolean gstVideoPlayer::initialize_pipeline(QStringList Files)
         //QString templol = temp.append(QString::number(i));
         QString name = "bla";
         pipeline = gst_pipeline_new(name.append(QString::number(i)).toStdString().c_str());
+
+        /******** Is this needed? *********/
+        Q_ASSERT(pipeline);
+        gst_object_ref (GST_OBJECT (pipeline)); //Take ownership
+        gst_object_sink (GST_OBJECT (pipeline));
+        /*********************************/
+
         bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline));
         gst_bus_add_watch(bus, (GstBusFunc)bus_callback, NULL);
         gst_object_unref(GST_OBJECT(bus));

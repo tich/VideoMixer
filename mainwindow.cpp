@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_MediaObject->enqueue(Phonon::MediaSource("/home/tich/Desktop/vid.flv")); // or setCurrentSource
     m_MediaObject->play();
 */
-    //m_videoWidget = new Phonon::VideoWidget(ui->widget);
+    m_videoWidget = new Phonon::VideoWidget(ui->widget);
     //m_videoWidget->setGeometry(0,0,ui->widget->width(),ui->widget->height());
     //Phonon::createPath(m_MediaObject, m_videoWidget);
     /*
@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     begin = false;
     //QPixmap image = QPixmap::grabWindow(ui->widget->winId());
     //scene->addPixmap(image);
-    timer = new QTimer(this);
+    //timer = new QTimer(this);
     //connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     /*
     bla = new CaptureThread(this);
@@ -42,11 +42,11 @@ MainWindow::MainWindow(QWidget *parent) :
     setAttribute(Qt::WA_PaintOnScreen,true);
     */
 
-//    bleh = new CameraThread(this);
-//    bleh->startThread(NULL);
-//    proc = new ProcessThread(this);
-//    connect(proc, SIGNAL(processFinished(int,int,int,int)), SLOT(getCoord(int,int,int,int)));
-//    connect(bleh, SIGNAL(processMe(QImage)), proc, SLOT(processStuff(QImage)));
+    bleh = new CameraThread(this);
+    bleh->startThread(NULL);
+    proc = new ProcessThread(this);
+    connect(proc, SIGNAL(processFinished(int,int,int,int)), SLOT(getCoord(int,int,int,int)));
+    connect(bleh, SIGNAL(processMe(QImage)), proc, SLOT(processStuff(QImage)));
 
     vid =new gstVideoPlayer();
     QStringList Files;
@@ -59,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     glwidget = glwidget2 = 0;
     timer2 = new QTimer(this);
-    timer2->setInterval(20);//40=25Hz
+    timer2->setInterval(40);//40=25Hz
     connect(timer2, SIGNAL(timeout()), this, SLOT(update()));
     timer2->start();
     /*
@@ -94,7 +94,7 @@ void MainWindow::update()
         glwidget2->updateGL();
         glwidget2->paintEngine();
         if(glwidget->updatesEnabled() && glwidget->isVisible())
-            ui->label_3->setText("bla " + QString::number(count++));
+            ui->label_3->setText("bla " + QString::number(count));
         else
             ui->label_3->setText("bloup" + QString::number(count++));
     }
