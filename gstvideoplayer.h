@@ -9,9 +9,10 @@ class AppData;
 
 class gstVideoPlayer : public QObject
 {
+
 public:
     gstVideoPlayer();
-    void toggle_play_state(int video_stream);
+    void toggle_play_state(int video_stream, int play);
     static gboolean bus_callback (GstBus * bus, GstMessage * message);
     gboolean initialize_pipeline (QStringList Files);
     static void new_buffer_added (GstAppSink *appsink, gpointer user_data);
@@ -22,6 +23,7 @@ public:
     static bool cold_start;
     static bool scanning;
     static GstBuffer ** buffer;
+    static int length;
 private:
     GstElement *pipeline;
     GstElement **pipelines;

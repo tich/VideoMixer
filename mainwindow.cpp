@@ -18,8 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_MediaObject->enqueue(Phonon::MediaSource("/home/tich/Desktop/vid.flv")); // or setCurrentSource
     m_MediaObject->play();
 */
-    m_videoWidget = new Phonon::VideoWidget(ui->widget);
-    m_videoWidget->setGeometry(0,0,ui->widget->width(),ui->widget->height());
+    //m_videoWidget = new Phonon::VideoWidget(ui->widget);
+    //m_videoWidget->setGeometry(0,0,ui->widget->width(),ui->widget->height());
     //Phonon::createPath(m_MediaObject, m_videoWidget);
     /*
     m_videoWidget = new Phonon::VideoWidget(this);
@@ -42,29 +42,26 @@ MainWindow::MainWindow(QWidget *parent) :
     setAttribute(Qt::WA_PaintOnScreen,true);
     */
 
-    bleh = new CameraThread(this);
-    bleh->startThread(NULL);
-    proc = new ProcessThread(this);
-    connect(proc, SIGNAL(processFinished(int,int,int,int)), SLOT(getCoord(int,int,int,int)));
-    connect(bleh, SIGNAL(processMe(QImage)), proc, SLOT(processStuff(QImage)));
+//    bleh = new CameraThread(this);
+//    bleh->startThread(NULL);
+//    proc = new ProcessThread(this);
+//    connect(proc, SIGNAL(processFinished(int,int,int,int)), SLOT(getCoord(int,int,int,int)));
+//    connect(bleh, SIGNAL(processMe(QImage)), proc, SLOT(processStuff(QImage)));
 
-    glwidget = new GLWidget(ui->widget_2, 0);
-    gstVideoPlayer *vid =new gstVideoPlayer();
+    vid =new gstVideoPlayer();
     QStringList Files;
+    Files.append("/home/tich/Desktop/IMG_1483.MOV");
     Files.append("/home/tich/Desktop/vid.flv");
     if (!vid->initialize_pipeline (Files))
     {
         printf("Failed to initialize video pipeline!\n");
         return;
     }
-    else
-        vid->toggle_play_state(0);
+    glwidget = glwidget2 = 0;
     timer2 = new QTimer(this);
     timer2->setInterval(20);//40=25Hz
     connect(timer2, SIGNAL(timeout()), this, SLOT(update()));
-    glwidget->setGeometry(0,0,ui->widget_2->width(),ui->widget_2->height());
     timer2->start();
-
     /*
     connect(bla, SIGNAL(renderedImage(QImage)),SLOT(setPicture(QImage)));
     bla->setDeviceName("/dev/video0");
@@ -76,13 +73,31 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::update()
 {
-    glwidget->repaint();
-    glwidget->updateGL();
-    glwidget->paintEngine();
-    if(glwidget->updatesEnabled() && glwidget->isVisible())
-        ui->label_3->setText("bla " + QString::number(count));
-    else
-        ui->label_3->setText("bloup" + QString::number(count++));
+    if(gstVideoPlayer::scanning && glwidget==NULL && glwidget2 ==NULL)
+    {
+        vid->toggle_play_state(0, 1);
+        vid->toggle_play_state(1, 1);
+        printf("Toggle play state\n");
+        glwidget = new GLWidget(ui->widget_2,0);
+        glwidget2 = new GLWidget(ui->widget,1);
+        glwidget->setGeometry(0,0,ui->widget_2->width(),ui->widget_2->height());
+        glwidget2->setGeometry(0,0,ui->widget->width(),ui->widget->height());
+        glwidget2->setVisible(true);
+        glwidget->setVisible(true);
+    }
+    else if(glwidget != NULL && glwidget2 != NULL && gstVideoPlayer::scanning)
+    {
+        glwidget->repaint();
+        glwidget->updateGL();
+        glwidget->paintEngine();
+        glwidget2->repaint();
+        glwidget2->updateGL();
+        glwidget2->paintEngine();
+        if(glwidget->updatesEnabled() && glwidget->isVisible())
+            ui->label_3->setText("bla " + QString::number(count++));
+        else
+            ui->label_3->setText("bloup" + QString::number(count++));
+    }
     /*
     image[count % 10] = QPixmap::grabWindow(ui->widget->winId());
     count++;
@@ -103,7 +118,7 @@ void MainWindow::update()
 void MainWindow::getCoord(int posbX, int posbY, int posyX, int posyY)
 {
     //ui->label_3->setText(QString::number(posY));
-    ui->label->setGeometry(110+posyX, 10+posyY, ui->label->geometry().width(), ui->label->geometry().height());
+    ui->widget->setGeometry(110+posyX, 10+posyY, ui->widget->geometry().width(), ui->widget->geometry().height());
     ui->widget_2->setGeometry(370+posbX, 10+posbY, ui->widget_2->geometry().width(), ui->widget_2->geometry().height());
 }
 
@@ -111,9 +126,9 @@ void MainWindow::setPicture(QImage Image)
 {
     //myImage = Image.mirrored(true,false);
     //emit process(Image.mirrored(true,false));
-    QPixmap troll = QPixmap::fromImage(Image);
-    troll = troll.scaled(320, 240,Qt::IgnoreAspectRatio,Qt::FastTransformation);
-    ui->label->setPixmap(troll);
+    //QPixmap troll = QPixmap::fromImage(Image);
+    //troll = troll.scaled(320, 240,Qt::IgnoreAspectRatio,Qt::FastTransformation);
+    //ui->label->setPixmap(troll);
 }
 
 MainWindow::~MainWindow()
@@ -154,6 +169,5 @@ void MainWindow::changeEvent(QEvent *e)
 
 void MainWindow::on_verticalSlider_valueChanged(int value)
 {
-    ui->label->setGeometry(ui->label->geometry().x(), 10+(100-value), ui->label->geometry().width(), ui->label->geometry().height());
     ui->widget->setGeometry(ui->widget->geometry().x(), 10+(100-value), ui->widget->geometry().width(), ui->widget->geometry().height());
 }

@@ -289,7 +289,6 @@ void GLWidget::paintGL()
     painter.setPen(Qt::white);
 
     painter.drawText(20, 40, framesPerSecond + " fps");
-
     painter.end();
 
     swapBuffers();

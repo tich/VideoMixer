@@ -10,6 +10,7 @@
 #include "capturethread.h"
 #include "processthread.h"
 #include "capture.h"
+#include "gstvideoplayer.h"
 #include "glwidget.h"
 
 namespace Ui {
@@ -35,9 +36,10 @@ private:
     QPixmap image[10];
     QImage myImage;
     CaptureThread *bla;
+    gstVideoPlayer *vid;
     CameraThread *bleh;
     ProcessThread *proc;
-    GLWidget * glwidget;
+    GLWidget * glwidget, *glwidget2;
     int count;
     int pointer;
     bool begin;

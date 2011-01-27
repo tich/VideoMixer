@@ -18,6 +18,7 @@ bool gstVideoPlayer::cold_start;
 GstAppSink **gstVideoPlayer::appsink;
 GstBuffer **gstVideoPlayer::buffer;
 bool gstVideoPlayer::scanning=false;
+int gstVideoPlayer::length=0;
 
 gstVideoPlayer::gstVideoPlayer()
 {
@@ -40,16 +41,20 @@ gboolean gstVideoPlayer::initialize_pipeline(QStringList Files)
     gst_init(NULL, NULL);
 
     /* Create pipeline and attach a callback to it's message bus */
+    length = Files.length();
     pipelines = new GstElement*[Files.length()];
     appsink = new GstAppSink*[Files.length()];
+    for(int i =0; i<length;i++)
+        appsink[i] = NULL;
     buffer = new GstBuffer*[Files.length()];
     printf("length: %d\n", Files.length());
-    for(int i=0; i<Files.length();i++)
+    for(int i=0; i<length;i++)
     {
-        QString temp = Files.takeAt(i);
+        QString temp = Files.takeAt(0);
         printf("Loading %s\n", temp.toStdString().c_str());
         //QString templol = temp.append(QString::number(i));
-        pipeline = gst_pipeline_new("bla");
+        QString name = "bla";
+        pipeline = gst_pipeline_new(name.append(QString::number(i)).toStdString().c_str());
         bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline));
         gst_bus_add_watch(bus, (GstBusFunc)bus_callback, NULL);
         gst_object_unref(GST_OBJECT(bus));
@@ -111,7 +116,7 @@ gboolean gstVideoPlayer::initialize_pipeline(QStringList Files)
         *index = i;
         g_signal_connect (image_sink, "new-buffer", G_CALLBACK (new_buffer_added), index);
         pipelines[i] = pipeline;
-        gst_element_set_state(pipeline, GST_STATE_PLAYING);
+        gst_element_set_state(pipelines[i], GST_STATE_PLAYING);
     }
         return TRUE;
 }
@@ -143,9 +148,9 @@ void gstVideoPlayer::decodebin_new_decoded_pad_cb(GstElement *decodebin, GstPad 
     }
 }
 
-void gstVideoPlayer::toggle_play_state(int video_stream)
+void gstVideoPlayer::toggle_play_state(int video_stream, int play)
  {
-        if (scanning_status) {
+        if (!play) {
                 // we therefore want to stop the scan
                 scanning_status = 0;
                 gst_element_set_state (pipelines[video_stream], GST_STATE_PAUSED); //READY
@@ -166,7 +171,7 @@ void gstVideoPlayer::new_buffer_added (GstAppSink *_appsink, gpointer user_data)
         {
                 //initialize appsink
                 int *index = (int*)user_data;
-                printf("\nAppsink initialized!%d\n", *index);
+                printf("\nAppsink initialized! %d\n", *index);
                 appsink[*index]=_appsink;
                 gst_app_sink_set_drop(appsink[*index],true);
                 //turn off emit new_buffer_added
@@ -176,6 +181,16 @@ void gstVideoPlayer::new_buffer_added (GstAppSink *_appsink, gpointer user_data)
                 cold_start=false;
                 buffer_ready=true;
                 scanning=true;
+                for(int i=0;i<length;i++)
+                {
+                    if(appsink[i] == NULL)
+                    {
+                        printf("Still null\n");
+                        cold_start=true;
+                        buffer_ready=false;
+                        scanning=false;
+                    }
+                }
         }
 }
 
@@ -183,7 +198,7 @@ void gstVideoPlayer::refresh_buffer(int video_stream){
         if(appsink!=NULL){
                 buffer[video_stream] = gst_app_sink_pull_buffer(appsink[video_stream]);
                 buffer_ready=true;
-        }
+        };
 }
 
 /* Callback that gets called whenever pipeline's message bus has
