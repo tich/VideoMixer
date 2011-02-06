@@ -70,7 +70,7 @@ void ProcessThread::run()
                     momentb01 += 255 * y;
                     momentb00 += 255;
                 }
-                else if(hue <= 72 && hue >= 40 && sat >= 150 && value >= 150)
+                else if(hue <= 102 && hue >= 10 && sat >= 150 && value >= 150)
                 {
                     momenty10 += 255 * x;
                     momenty01 += 255 * y;

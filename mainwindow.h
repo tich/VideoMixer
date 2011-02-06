@@ -43,6 +43,7 @@ private:
     int count;
     int pointer;
     bool begin;
+    int scaling;
 private slots:
     void on_verticalSlider_valueChanged(int value);
     void update();
@@ -50,6 +51,10 @@ private slots:
     void getCoord(int,int,int,int);
 signals:
     void process(QImage);
+};
+enum Scaling {
+    DOWNSCALE_HIGHER,
+    UPSCALE_LOWER
 };
 
 #endif // MAINWINDOW_H

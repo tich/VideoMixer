@@ -5,6 +5,7 @@
 #include "gstvideoplayer.h"
 #include "glwidget.h"
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -50,8 +51,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     vid =new gstVideoPlayer();
     QStringList Files;
-    Files.append("/home/tich/Desktop/IMG_1483.MOV");
     Files.append("/home/tich/Desktop/vid.flv");
+    Files.append("/home/tich/Desktop/IMG_1483.MOV");
     if (!vid->initialize_pipeline (Files))
     {
         printf("Failed to initialize video pipeline!\n");
@@ -61,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent) :
     timer2 = new QTimer(this);
     timer2->setInterval(40);//40=25Hz
     connect(timer2, SIGNAL(timeout()), this, SLOT(update()));
+    scaling = DOWNSCALE_HIGHER;
     timer2->start();
     /*
     connect(bla, SIGNAL(renderedImage(QImage)),SLOT(setPicture(QImage)));
@@ -78,10 +80,10 @@ void MainWindow::update()
         vid->toggle_play_state(0, 1);
         vid->toggle_play_state(1, 1);
         printf("Toggle play state\n");
-        glwidget = new GLWidget(ui->widget_2,0);
-        glwidget2 = new GLWidget(ui->widget,1);
-        glwidget->setGeometry(0,0,ui->widget_2->width(),ui->widget_2->height());
-        glwidget2->setGeometry(0,0,ui->widget->width(),ui->widget->height());
+        glwidget = new GLWidget(ui->widget,0);
+        glwidget2 = new GLWidget(ui->widget_2,1);
+        glwidget->setGeometry(0,0,ui->widget->width(),ui->widget->height());
+        glwidget2->setGeometry(0,0,ui->widget_2->width(),ui->widget_2->height());
         glwidget2->setVisible(true);
         glwidget->setVisible(true);
     }
@@ -117,9 +119,35 @@ void MainWindow::update()
 }
 void MainWindow::getCoord(int posbX, int posbY, int posyX, int posyY)
 {
-    //ui->label_3->setText(QString::number(posY));
-    ui->widget->setGeometry(110+posyX, 10+posyY, ui->widget->geometry().width(), ui->widget->geometry().height());
-    ui->widget_2->setGeometry(370+posbX, 10+posbY, ui->widget_2->geometry().width(), ui->widget_2->geometry().height());
+    QImage image1;//(370,181,QImage::Format_ARGB32);
+    QImage image2;//(370,181,QImage::Format_ARGB32);
+
+    image1 = glwidget->image.copy();
+    image2 = glwidget2->image.copy();
+
+    QImage alpha(image2.width(),image2.height(),QImage::Format_Indexed8);
+    int alphaconst = (posbX/217.0)*256;
+    alpha.fill(alphaconst);
+    image2.setAlphaChannel(alpha);
+
+    int x=0, y=ui->widget->geometry().height();
+    if((ui->widget_2->geometry().y()-ui->widget->geometry().y() < ui->widget->geometry().height()))
+    {
+        y = ui->widget_2->geometry().y()-ui->widget->geometry().y();
+    }
+    if(scaling == DOWNSCALE_HIGHER)
+        image1 = image1.scaled(image2.width(), image2.height());
+    else
+        image2 = image2.scaled(image1.width(), image1.height());
+    QPainter p(&image1);
+    p.setCompositionMode(QPainter::CompositionMode_SourceOver);
+    p.drawImage(x,y,image2);
+    p.end();
+
+    QPixmap bla = QPixmap::fromImage(image1.scaled(370,181));
+    ui->label_3->setPixmap(bla);
+    //ui->widget->setGeometry(70+posyX, 10+posyY, ui->widget->geometry().width(), ui->widget->geometry().height());
+    ui->widget_2->setGeometry(ui->widget_2->x(), 105+posbY, ui->widget_2->width(), ui->widget_2->height());
 }
 
 void MainWindow::setPicture(QImage Image)

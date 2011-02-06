@@ -73,11 +73,12 @@ void GLWidget::refresh_texture()
                 first = false;
                 printf("\nwidth = %d, height = %d\n", iwidth, iheight);
             }
+            image = QImage(data, iwidth, iheight, QImage::Format_RGB888);
             glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, iwidth,iheight, 0, GL_RGB, GL_UNSIGNED_BYTE, data );
             gst_buffer_unref(gstVideoPlayer::buffer[video_stream]);
         }
-        else
-            printf("Buffer null\n");
+        //else
+        //    printf("Buffer null\n");
     }
 }
 

@@ -85,7 +85,7 @@ gboolean CameraCapture::initialize_pipeline(int *argc, char ***argv) {
 
 	/* Specify what kind of video is wanted from the camera */
 	//caps = gst_caps_from_string("video/x-raw-yuv,format=(fourcc)UYVY,width=800,height=480"); //framerate=[1/30,30/1]
-        //caps = gst_caps_from_string("video/x-raw-yuv,format=(fourcc)UYVY,width=640,height=480"); //framerate=[1/30,30/1]
+        //caps = gst_caps_from_string("video/x-raw-rgb,width=640,height=480"); //framerate=[1/30,30/1]
 	//caps = gst_caps_from_string("video/x-raw-yuv,format=(fourcc)UYVY,width=320,height=240"); //framerate=[1/30,30/1]
         caps = gst_caps_from_string("video/x-raw-rgb,width=320,height=240"); //framerate=[1/30,30/1]
 	//caps = gst_caps_from_string("video/x-raw-yuv,format=(fourcc)UYVY,width=378,height=225"); //framerate=[1/30,30/1]

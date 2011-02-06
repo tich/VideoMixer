@@ -15,6 +15,7 @@ public:
     ~GLWidget();
     void refresh_texture();
     void paintTexturedCube();
+    QImage image;
 protected:
     void paintGL ();
     void initializeGL ();
